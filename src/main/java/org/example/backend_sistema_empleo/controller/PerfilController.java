@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/perfiles")
-@CrossOrigin(origins = "*")
+@CrossOrigin(originPatterns = "*")
 public class PerfilController {
 
     private final PerfilService perfilService;
@@ -17,22 +17,22 @@ public class PerfilController {
         this.perfilService = perfilService;
     }
 
-    @GetMapping
+    @GetMapping("/listar")
     public List<PerfilDto> listar() {
         return perfilService.listar();
     }
 
-    @PostMapping
+    @PostMapping("/guardar")
     public PerfilDto guardar(@RequestBody PerfilDto dto) {
         return perfilService.guardar(dto);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/actualizar/{id}")
     public PerfilDto actualizar(@PathVariable Long id, @RequestBody PerfilDto dto) {
         return perfilService.actualizar(id, dto);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public void eliminar(@PathVariable Long id) {
         perfilService.eliminar(id);
     }

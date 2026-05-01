@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/empresas")
-@CrossOrigin(origins = "*") // permite conexión con Android
+@CrossOrigin(originPatterns = "*")
 public class EmpresaController {
 
     private final EmpresaService empresaService;
@@ -17,22 +17,22 @@ public class EmpresaController {
         this.empresaService = empresaService;
     }
 
-    @GetMapping
+    @GetMapping("/listar")
     public List<EmpresaDto> listar() {
         return empresaService.listar();
     }
 
-    @PostMapping
+    @PostMapping("/guardar")
     public EmpresaDto guardar(@RequestBody EmpresaDto dto) {
         return empresaService.guardar(dto);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/actualizar/{id}")
     public EmpresaDto actualizar(@PathVariable Long id, @RequestBody EmpresaDto dto) {
         return empresaService.actualizar(id, dto);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public void eliminar(@PathVariable Long id) {
         empresaService.eliminar(id);
     }

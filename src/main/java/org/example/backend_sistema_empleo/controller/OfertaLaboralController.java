@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/ofertas")
-@CrossOrigin(origins = "*")
+@CrossOrigin(originPatterns = "*")
 public class OfertaLaboralController {
 
     private final OfertaLaboralService ofertaService;
@@ -17,22 +17,22 @@ public class OfertaLaboralController {
         this.ofertaService = ofertaService;
     }
 
-    @GetMapping
+    @GetMapping("/listar")
     public List<OfertaLaboralDto> listar() {
         return ofertaService.listar();
     }
 
-    @PostMapping
+    @PostMapping("/guardar")
     public OfertaLaboralDto guardar(@RequestBody OfertaLaboralDto dto) {
         return ofertaService.guardar(dto);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/actualizar/{id}")
     public OfertaLaboralDto actualizar(@PathVariable Long id, @RequestBody OfertaLaboralDto dto) {
         return ofertaService.actualizar(id, dto);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/eliminar/{id}")
     public void eliminar(@PathVariable Long id) {
         ofertaService.eliminar(id);
     }
