@@ -24,6 +24,7 @@ public class Usuario {
     private String tipoUsuario; // ESTUDIANTE, EGRESADO
     private LocalDate fechaRegistro;
     private Boolean estado; // true = activo, false = inactivo
+    private String password;
 
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     private Perfil perfil;

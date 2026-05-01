@@ -32,6 +32,11 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.actualizar(id, dto));
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<UsuarioDto> login(@RequestBody UsuarioDto dto) {
+        return ResponseEntity.ok(usuarioService.login(dto.getEmail(), dto.getPassword()));
+    }
+
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         usuarioService.eliminar(id);

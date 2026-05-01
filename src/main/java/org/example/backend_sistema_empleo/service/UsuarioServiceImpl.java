@@ -25,7 +25,8 @@ public class UsuarioServiceImpl implements UsuarioService {
                 u.getTelefono(),
                 u.getTipoUsuario(),
                 u.getFechaRegistro(),
-                u.getEstado()
+                u.getEstado(),
+                u.getPassword()
         );
     }
 
@@ -39,6 +40,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         u.setTipoUsuario(dto.getTipoUsuario());
         u.setFechaRegistro(dto.getFechaRegistro());
         u.setEstado(dto.getEstado());
+        u.setPassword(dto.getPassword());
         return u;
     }
 
@@ -58,6 +60,16 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (!usuarioRepository.existsById(id)) throw new RuntimeException("Usuario no encontrado");
         dto.setIdUsuario(id);
         return guardar(dto);
+    }
+
+    @Override
+    public UsuarioDto login(String email, String password) {
+        Usuario u = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        if (!u.getPassword().equals(password)) {
+            throw new RuntimeException("Contraseña incorrecta");
+        }
+        return convertirADto(u);
     }
 
     @Override
