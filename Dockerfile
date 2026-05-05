@@ -1,18 +1,17 @@
-FROM gradle:8.5-jdk21 AS build
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
 COPY . .
 
-WORKDIR /app/backend
+RUN mvn clean package -DskipTests
 
-RUN gradle build --no-daemon -x test
 
 FROM eclipse-temurin:21-jdk-jammy
 
 WORKDIR /app
 
-COPY --from=build /app/backend/build/libs/*.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 
