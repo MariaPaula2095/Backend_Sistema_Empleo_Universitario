@@ -1,10 +1,10 @@
 package org.example.backend_sistema_empleo.repository;
 
-
 import org.example.backend_sistema_empleo.model.OfertaLaboral;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 
 public interface OfertaLaboralRepository extends JpaRepository<OfertaLaboral, Long> {
@@ -17,4 +17,8 @@ public interface OfertaLaboralRepository extends JpaRepository<OfertaLaboral, Lo
 
     @Query(value = "SELECT * FROM oferta_laboral WHERE estado = true", nativeQuery = true)
     List<OfertaLaboral> findAllActive();
+
+    // 🏢 OFERTAS POR EMPRESA (IMPORTANTE PARA FUTURO LOGIN EMPRESA)
+    @Query(value = "SELECT * FROM oferta_laboral WHERE id_empresa = :idEmpresa", nativeQuery = true)
+    List<OfertaLaboral> findByEmpresa(@Param("idEmpresa") Long idEmpresa);
 }

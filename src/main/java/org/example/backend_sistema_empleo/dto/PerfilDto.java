@@ -2,10 +2,6 @@ package org.example.backend_sistema_empleo.dto;
 
 import lombok.*;
 
-/**
- * DTO de salida: define exactamente lo que devuelve la API.
- * Expone solo los campos necesarios del perfil profesional.
- */
 
 @Data
 @NoArgsConstructor

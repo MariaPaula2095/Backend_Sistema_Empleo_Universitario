@@ -6,11 +6,14 @@ import java.util.List;
 public interface PostulacionService {
 
     List<PostulacionDto> listar();
-    PostulacionDto guardar(PostulacionDto postulacionDto);
-    PostulacionDto actualizar(Long id, PostulacionDto postulacionDto);
+
+    PostulacionDto guardar(PostulacionDto dto);
+
+    PostulacionDto actualizar(Long id, PostulacionDto dto);
+
     void eliminar(Long id);
 
-    // Consultas nativas
-    List<PostulacionDto> listarPorCandidato(Long idUsuario);
+    List<PostulacionDto> listarPorUsuario(Long idUsuario);
+
     List<PostulacionDto> listarCandidatosPorOferta(Long idOferta);
 }

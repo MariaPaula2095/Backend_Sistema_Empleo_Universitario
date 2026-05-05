@@ -21,11 +21,15 @@ public class OfertaLaboral {
     private String descripcion;
     private String area;
     private Double salario;
+
     private String modalidad; // PRESENCIAL, REMOTO, HIBRIDO
+
     private LocalDate fechaPublicacion;
     private LocalDate fechaCierre;
-    private Boolean estado; // true = activa, false = inactiva
 
+    private Boolean estado; // true = activa
+
+    // 🏢 RELACIÓN REAL CON EMPRESA (CLAVE DEL SISTEMA)
     @ManyToOne
     @JoinColumn(name = "id_empresa")
     private Empresa empresa;

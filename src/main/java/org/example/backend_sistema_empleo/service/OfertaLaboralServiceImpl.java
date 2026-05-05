@@ -1,10 +1,10 @@
 package org.example.backend_sistema_empleo.service;
 
 import org.example.backend_sistema_empleo.dto.OfertaLaboralDto;
-import org.example.backend_sistema_empleo.model.OfertaLaboral;
 import org.example.backend_sistema_empleo.model.Empresa;
-import org.example.backend_sistema_empleo.repository.OfertaLaboralRepository;
+import org.example.backend_sistema_empleo.model.OfertaLaboral;
 import org.example.backend_sistema_empleo.repository.EmpresaRepository;
+import org.example.backend_sistema_empleo.repository.OfertaLaboralRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,8 +22,6 @@ public class OfertaLaboralServiceImpl implements OfertaLaboralService {
         this.empresaRepository = empresaRepository;
     }
 
-    // ---------- Conversión ----------
-
     private OfertaLaboralDto convertirADto(OfertaLaboral o) {
         return new OfertaLaboralDto(
                 o.getIdOferta(),
@@ -40,7 +38,9 @@ public class OfertaLaboralServiceImpl implements OfertaLaboralService {
     }
 
     private OfertaLaboral convertirAEntity(OfertaLaboralDto dto) {
+
         OfertaLaboral o = new OfertaLaboral();
+
         o.setIdOferta(dto.getIdOferta());
         o.setTitulo(dto.getTitulo());
         o.setDescripcion(dto.getDescripcion());
@@ -51,15 +51,17 @@ public class OfertaLaboralServiceImpl implements OfertaLaboralService {
         o.setFechaCierre(dto.getFechaCierre());
         o.setEstado(dto.getEstado());
 
+        // 🏢 CLAVE: asignar empresa obligatoriamente
         if (dto.getIdEmpresa() != null) {
-            Empresa empresa = empresaRepository.findById(dto.getIdEmpresa()).orElseThrow();
+            Empresa empresa = empresaRepository.findById(dto.getIdEmpresa())
+                    .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
+
             o.setEmpresa(empresa);
         }
 
         return o;
     }
 
-    // ---------- CRUD ----------
 
     @Override
     public List<OfertaLaboralDto> listar() {
@@ -71,16 +73,32 @@ public class OfertaLaboralServiceImpl implements OfertaLaboralService {
 
     @Override
     public OfertaLaboralDto guardar(OfertaLaboralDto dto) {
-        return convertirADto(ofertaRepository.save(convertirAEntity(dto)));
+
+        OfertaLaboral oferta = convertirAEntity(dto);
+
+        if (oferta.getEstado() == null) {
+            oferta.setEstado(true);
+        }
+
+        return convertirADto(ofertaRepository.save(oferta));
     }
 
     @Override
     public OfertaLaboralDto actualizar(Long id, OfertaLaboralDto dto) {
-        if (!ofertaRepository.existsById(id)) {
-            throw new RuntimeException("No existe la oferta laboral");
-        }
-        dto.setIdOferta(id);
-        return guardar(dto);
+
+        OfertaLaboral oferta = ofertaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No existe la oferta laboral"));
+
+        oferta.setTitulo(dto.getTitulo());
+        oferta.setDescripcion(dto.getDescripcion());
+        oferta.setArea(dto.getArea());
+        oferta.setSalario(dto.getSalario());
+        oferta.setModalidad(dto.getModalidad());
+        oferta.setFechaPublicacion(dto.getFechaPublicacion());
+        oferta.setFechaCierre(dto.getFechaCierre());
+        oferta.setEstado(dto.getEstado());
+
+        return convertirADto(ofertaRepository.save(oferta));
     }
 
     @Override
@@ -88,7 +106,7 @@ public class OfertaLaboralServiceImpl implements OfertaLaboralService {
         ofertaRepository.deleteById(id);
     }
 
-    // ---------- Consultas nativas ----------
+    // ---------- CONSULTAS ----------
 
     @Override
     public List<OfertaLaboralDto> buscarPorArea(String area) {
@@ -109,6 +127,15 @@ public class OfertaLaboralServiceImpl implements OfertaLaboralService {
     @Override
     public List<OfertaLaboralDto> listarOfertasActivas() {
         return ofertaRepository.findAllActive()
+                .stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
+    }
+
+    // 🏢 NUEVO: ofertas por empresa
+    @Override
+    public List<OfertaLaboralDto> listarPorEmpresa(Long idEmpresa) {
+        return ofertaRepository.findByEmpresa(idEmpresa)
                 .stream()
                 .map(this::convertirADto)
                 .collect(Collectors.toList());

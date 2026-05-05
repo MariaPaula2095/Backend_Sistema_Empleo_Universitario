@@ -1,10 +1,15 @@
 package org.example.backend_sistema_empleo.controller;
 
+import org.example.backend_sistema_empleo.configuration.JwtUtil;
 import org.example.backend_sistema_empleo.dto.EmpresaDto;
+import org.example.backend_sistema_empleo.model.Empresa;
 import org.example.backend_sistema_empleo.service.EmpresaService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/empresas")
@@ -12,9 +17,15 @@ import java.util.List;
 public class EmpresaController {
 
     private final EmpresaService empresaService;
+    private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
-    public EmpresaController(EmpresaService empresaService) {
+    public EmpresaController(EmpresaService empresaService,
+                             JwtUtil jwtUtil,
+                             PasswordEncoder passwordEncoder) {
         this.empresaService = empresaService;
+        this.jwtUtil = jwtUtil;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/listar")
@@ -40,5 +51,25 @@ public class EmpresaController {
     @GetMapping("/top")
     public List<EmpresaDto> listarEmpresasConMasOfertas() {
         return empresaService.listarEmpresasConMasOfertas();
+    }
+
+    // 🔐 LOGIN EMPRESA
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Empresa empresa) {
+
+        Empresa emp = empresaService.login(
+                empresa.getEmail(),
+                empresa.getPassword()
+        );
+
+        String token = jwtUtil.generateToken(
+                emp.getEmail(),
+                emp.getRol().name()
+        );
+
+        return ResponseEntity.ok(Map.of(
+                "token", token,
+                "empresa", emp
+        ));
     }
 }

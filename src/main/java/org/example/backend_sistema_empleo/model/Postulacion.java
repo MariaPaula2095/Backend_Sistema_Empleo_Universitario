@@ -18,7 +18,9 @@ public class Postulacion {
     private Long idPostulacion;
 
     private LocalDate fechaPostulacion;
-    private String estado; // PENDIENTE, EN_REVISION, ACEPTADA, RECHAZADA
+
+    @Enumerated(EnumType.STRING)
+    private EstadoPostulacion estado;
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")

@@ -3,11 +3,7 @@ package org.example.backend_sistema_empleo.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import java.time.LocalDate;
-
-/**
- * DTO de salida: define exactamente lo que devuelve la API.
- * Expone solo los campos necesarios, omite datos sensibles.
- */
+import org.example.backend_sistema_empleo.model.Rol;
 
 @Data
 @NoArgsConstructor
@@ -20,11 +16,12 @@ public class UsuarioDto {
     private String apellido;
     private String email;
     private String telefono;
-    private String tipoUsuario;
+
+    private Rol tipoUsuario;
+
     private LocalDate fechaRegistro;
     private Boolean estado;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    //para que no se vea la contradeña
-    private String password;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
 }

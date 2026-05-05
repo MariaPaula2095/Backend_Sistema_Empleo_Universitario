@@ -2,6 +2,7 @@ package org.example.backend_sistema_empleo.controller;
 
 import org.example.backend_sistema_empleo.dto.OfertaLaboralDto;
 import org.example.backend_sistema_empleo.service.OfertaLaboralService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,37 +18,34 @@ public class OfertaLaboralController {
         this.ofertaService = ofertaService;
     }
 
+    // 👤 todos ven
     @GetMapping("/listar")
+    @PreAuthorize("hasAnyRole('ADMIN','ESTUDIANTE','EMPRESA')")
     public List<OfertaLaboralDto> listar() {
         return ofertaService.listar();
     }
 
+    // 🏢 SOLO EMPRESA Y ADMIN PUBLICAN
     @PostMapping("/guardar")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPRESA')")
     public OfertaLaboralDto guardar(@RequestBody OfertaLaboralDto dto) {
         return ofertaService.guardar(dto);
     }
 
     @PutMapping("/actualizar/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPRESA')")
     public OfertaLaboralDto actualizar(@PathVariable Long id, @RequestBody OfertaLaboralDto dto) {
         return ofertaService.actualizar(id, dto);
     }
 
     @DeleteMapping("/eliminar/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPRESA')")
     public void eliminar(@PathVariable Long id) {
         ofertaService.eliminar(id);
     }
 
-    @GetMapping("/area/{area}")
-    public List<OfertaLaboralDto> buscarPorArea(@PathVariable String area) {
-        return ofertaService.buscarPorArea(area);
-    }
-
-    @GetMapping("/cargo/{cargo}")
-    public List<OfertaLaboralDto> buscarPorCargo(@PathVariable String cargo) {
-        return ofertaService.buscarPorCargo(cargo);
-    }
-
     @GetMapping("/activas")
+    @PreAuthorize("hasAnyRole('ADMIN','ESTUDIANTE','EMPRESA')")
     public List<OfertaLaboralDto> listarActivas() {
         return ofertaService.listarOfertasActivas();
     }

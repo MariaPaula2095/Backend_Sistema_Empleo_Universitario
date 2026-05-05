@@ -22,4 +22,16 @@ public class Empresa {
     private String email;
     private String telefono;
     private String ciudad;
+
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Rol rol;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.rol == null) {
+            this.rol = Rol.EMPRESA;
+        }
+    }
 }
