@@ -27,7 +27,7 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.guardar(dto));
     }
 
-    @PutMapping("/actualizar/{id}")
+    @PatchMapping("/actualizar/{id}")
     public ResponseEntity<UsuarioDto> actualizar(@PathVariable Long id, @RequestBody UsuarioDto dto) {
         return ResponseEntity.ok(usuarioService.actualizar(id, dto));
     }

@@ -27,7 +27,7 @@ public class PerfilController {
         return perfilService.guardar(dto);
     }
 
-    @PutMapping("/actualizar/{id}")
+    @PatchMapping("/actualizar/{id}")
     public PerfilDto actualizar(@PathVariable Long id, @RequestBody PerfilDto dto) {
         return perfilService.actualizar(id, dto);
     }

@@ -70,11 +70,45 @@ public class PerfilServiceImpl implements PerfilService {
 
     @Override
     public PerfilDto actualizar(Long id, PerfilDto dto) {
-        if (!perfilRepository.existsById(id)) {
-            throw new RuntimeException("No existe el perfil");
+        Perfil perfil = perfilRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No existe el perfil"));
+
+        if (dto.getCarrera() != null) {
+            perfil.setCarrera(dto.getCarrera());
         }
-        dto.setIdPerfil(id);
-        return guardar(dto);
+
+        if (dto.getUniversidad() != null) {
+            perfil.setUniversidad(dto.getUniversidad());
+        }
+
+        if (dto.getSemestre() != null) {
+            perfil.setSemestre(dto.getSemestre());
+        }
+
+        if (dto.getHabilidades() != null) {
+            perfil.setHabilidades(dto.getHabilidades());
+        }
+
+        if (dto.getExperiencia() != null) {
+            perfil.setExperiencia(dto.getExperiencia());
+        }
+
+        if (dto.getCvUrl() != null) {
+            perfil.setCvUrl(dto.getCvUrl());
+        }
+
+        if (dto.getDisponibilidad() != null) {
+            perfil.setDisponibilidad(dto.getDisponibilidad());
+        }
+
+        // Solo cambiar usuario si viene uno nuevo
+        if (dto.getIdUsuario() != null) {
+            Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            perfil.setUsuario(usuario);
+        }
+
+        return convertirADto(perfilRepository.save(perfil));
     }
 
     @Override

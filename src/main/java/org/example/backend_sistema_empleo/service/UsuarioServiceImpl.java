@@ -57,9 +57,45 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioDto actualizar(Long id, UsuarioDto dto) {
-        if (!usuarioRepository.existsById(id)) throw new RuntimeException("Usuario no encontrado");
-        dto.setIdUsuario(id);
-        return guardar(dto);
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Actualización parcial (solo si no es null)
+        if (dto.getNombre() != null) {
+            usuario.setNombre(dto.getNombre());
+        }
+
+        if (dto.getApellido() != null) {
+            usuario.setApellido(dto.getApellido());
+        }
+
+        if (dto.getEmail() != null) {
+            usuario.setEmail(dto.getEmail());
+        }
+
+        if (dto.getTelefono() != null) {
+            usuario.setTelefono(dto.getTelefono());
+        }
+
+        if (dto.getTipoUsuario() != null) {
+            usuario.setTipoUsuario(dto.getTipoUsuario());
+        }
+
+        if (dto.getEstado() != null) {
+            usuario.setEstado(dto.getEstado());
+        }
+
+        // 🔥 CLAVE: solo actualizar password si viene
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            usuario.setPassword(dto.getPassword());
+        }
+
+        // ⚠️ fechaRegistro normalmente NO se debería modificar, pero si quieres:
+        if (dto.getFechaRegistro() != null) {
+            usuario.setFechaRegistro(dto.getFechaRegistro());
+        }
+
+        return convertirADto(usuarioRepository.save(usuario));
     }
 
     @Override

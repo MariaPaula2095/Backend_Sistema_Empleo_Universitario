@@ -23,7 +23,8 @@ public class UsuarioDto {
     private String tipoUsuario;
     private LocalDate fechaRegistro;
     private Boolean estado;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) //para que no se vea la contradeña
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    //para que no se vea la contradeña
     private String password;
 
 }
