@@ -1,7 +1,10 @@
 package org.example.backend_sistema_empleo.service;
 
+import org.example.backend_sistema_empleo.model.Empresa;
 import org.example.backend_sistema_empleo.model.EmpresaPendiente;
 import org.example.backend_sistema_empleo.repository.EmpresaPendienteRepository;
+import org.example.backend_sistema_empleo.repository.EmpresaRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +13,15 @@ import java.util.List;
 public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
 
     private final EmpresaPendienteRepository repo;
+    private final EmpresaRepository empresaRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public EmpresaPendienteServiceImpl(EmpresaPendienteRepository repo) {
+    public EmpresaPendienteServiceImpl(EmpresaPendienteRepository repo,
+                                       EmpresaRepository empresaRepository,
+                                       PasswordEncoder passwordEncoder) {
         this.repo = repo;
+        this.empresaRepository = empresaRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private void validarEmail(String email) {
@@ -34,6 +43,11 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
 
         validarEmail(emp.getEmail());
 
+        if (emp.getPassword() == null || emp.getPassword().isBlank()) {
+            throw new IllegalArgumentException("La contraseña es obligatoria");
+        }
+
+        emp.setPassword(passwordEncoder.encode(emp.getPassword()));
         emp.setEstado("PENDIENTE");
         emp.setMensaje("En revisión por el administrador");
 
@@ -53,6 +67,13 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
 
         emp.setEstado("APROBADA");
         emp.setMensaje("Empresa aprobada por el administrador");
+
+        // Crear empresa en tabla empresa con la contraseña que registró
+        Empresa empresa = new Empresa();
+        empresa.setNombre(emp.getNombre());
+        empresa.setEmail(emp.getEmail());
+        empresa.setPassword(emp.getPassword());
+        empresaRepository.save(empresa);
 
         return repo.save(emp);
     }

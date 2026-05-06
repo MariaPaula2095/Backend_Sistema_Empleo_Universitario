@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 @Configuration
@@ -49,11 +50,24 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Públicos sin token
                         .requestMatchers("/api/usuarios/guardar").permitAll()
                         .requestMatchers("/api/usuarios/login").permitAll()
+                        .requestMatchers("/api/usuarios/recuperar-password").permitAll()
                         .requestMatchers("/api/empresas/login").permitAll()
+                        .requestMatchers("/api/empresas/listar").permitAll()
+                        .requestMatchers("/api/empresas/top").permitAll()
+                        .requestMatchers("/api/empresas-pendientes/enviar").permitAll()
+                        .requestMatchers("/api/ofertas/listar").permitAll()
+                        .requestMatchers("/api/ofertas/activas").permitAll()
 
+                        // Solo ADMIN
                         .requestMatchers("/api/usuarios/listar").hasRole("ADMIN")
+                        .requestMatchers("/api/empresas-pendientes/listar").hasRole("ADMIN")
+                        .requestMatchers("/api/empresas-pendientes/aprobar/**").hasRole("ADMIN")
+                        .requestMatchers("/api/empresas-pendientes/rechazar/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )

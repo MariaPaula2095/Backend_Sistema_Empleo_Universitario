@@ -1,7 +1,10 @@
 package org.example.backend_sistema_empleo.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
+
+import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
 
 @Entity
 @Table(name = "empresa_pendiente")
@@ -20,7 +23,10 @@ public class EmpresaPendiente {
 
     private String email;
 
-    private String estado; // PENDIENTE, APROBADA, RECHAZADA
+    @JsonProperty(access = WRITE_ONLY)
+    private String password;
+
+    private String estado;
 
     private String mensaje;
 }

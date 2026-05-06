@@ -41,7 +41,7 @@ public class UsuarioController {
 
     // 🎓 SOLO EL MISMO USUARIO (STUDENT) O ADMIN
     @PatchMapping("/actualizar/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @usuarioSecurity.esPropietario(#id)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ESTUDIANTE')")
     public ResponseEntity<UsuarioDto> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody UsuarioDto dto) {

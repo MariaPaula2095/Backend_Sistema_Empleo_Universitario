@@ -25,14 +25,14 @@ public class PostulacionController {
     }
 
     @PostMapping("/guardar")
-    @PreAuthorize("hasRole('STUDENT')")
+    @PreAuthorize("hasRole('ESTUDIANTE')")
     public ResponseEntity<PostulacionDto> guardar(@RequestBody PostulacionDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(postulacionService.guardar(dto));
     }
 
     @PutMapping("/actualizar/{id}")
-    @PreAuthorize("hasRole('ADMIN') or @postulacionSecurity.esPropietario(#id)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ESTUDIANTE')")
     public ResponseEntity<PostulacionDto> actualizar(@PathVariable Long id, @RequestBody PostulacionDto dto) {
         return ResponseEntity.ok(postulacionService.actualizar(id, dto));
     }
