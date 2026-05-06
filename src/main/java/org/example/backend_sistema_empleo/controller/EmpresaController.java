@@ -2,10 +2,8 @@ package org.example.backend_sistema_empleo.controller;
 
 import org.example.backend_sistema_empleo.configuration.JwtUtil;
 import org.example.backend_sistema_empleo.dto.EmpresaDto;
-import org.example.backend_sistema_empleo.model.Empresa;
 import org.example.backend_sistema_empleo.service.EmpresaService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,19 +11,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/empresas")
-@CrossOrigin(originPatterns = "*")
 public class EmpresaController {
 
     private final EmpresaService empresaService;
     private final JwtUtil jwtUtil;
-    private final PasswordEncoder passwordEncoder;
 
-    public EmpresaController(EmpresaService empresaService,
-                             JwtUtil jwtUtil,
-                             PasswordEncoder passwordEncoder) {
+    public EmpresaController(EmpresaService empresaService, JwtUtil jwtUtil) {
         this.empresaService = empresaService;
         this.jwtUtil = jwtUtil;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/listar")
@@ -53,23 +46,16 @@ public class EmpresaController {
         return empresaService.listarEmpresasConMasOfertas();
     }
 
-    // 🔐 LOGIN EMPRESA
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Empresa empresa) {
+    public ResponseEntity<?> login(@RequestBody EmpresaDto dto) {
 
-        Empresa emp = empresaService.login(
-                empresa.getEmail(),
-                empresa.getPassword()
-        );
+        EmpresaDto empresa = empresaService.login(dto.getEmail(), dto.getPassword());
 
-        String token = jwtUtil.generateToken(
-                emp.getEmail(),
-                emp.getRol().name()
-        );
+        String token = jwtUtil.generateToken(empresa.getEmail(), "EMPRESA");
 
         return ResponseEntity.ok(Map.of(
                 "token", token,
-                "empresa", emp
+                "empresa", empresa
         ));
     }
 }

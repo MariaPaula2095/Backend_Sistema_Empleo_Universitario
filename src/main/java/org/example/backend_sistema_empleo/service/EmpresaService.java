@@ -1,7 +1,6 @@
 package org.example.backend_sistema_empleo.service;
 
 import org.example.backend_sistema_empleo.dto.EmpresaDto;
-import org.example.backend_sistema_empleo.model.Empresa;
 
 import java.util.List;
 
@@ -17,6 +16,5 @@ public interface EmpresaService {
 
     List<EmpresaDto> listarEmpresasConMasOfertas();
 
-    // 🔐 NUEVO: LOGIN EMPRESA
-    Empresa login(String email, String password);
+    EmpresaDto login(String email, String password);
 }

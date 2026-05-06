@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/perfiles")
-@CrossOrigin(originPatterns = "*")
 public class PerfilController {
 
     private final PerfilService perfilService;

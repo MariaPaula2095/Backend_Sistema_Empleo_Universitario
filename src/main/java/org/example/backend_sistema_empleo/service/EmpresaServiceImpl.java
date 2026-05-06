@@ -29,7 +29,8 @@ public class EmpresaServiceImpl implements EmpresaService {
                 e.getDescripcion(),
                 e.getEmail(),
                 e.getTelefono(),
-                e.getCiudad()
+                e.getCiudad(),
+                null
         );
     }
 
@@ -42,6 +43,7 @@ public class EmpresaServiceImpl implements EmpresaService {
         e.setEmail(dto.getEmail());
         e.setTelefono(dto.getTelefono());
         e.setCiudad(dto.getCiudad());
+        e.setPassword(dto.getPassword());
 
         return e;
     }
@@ -96,9 +98,8 @@ public class EmpresaServiceImpl implements EmpresaService {
                 .collect(Collectors.toList());
     }
 
-    // 🔐 LOGIN EMPRESA
     @Override
-    public Empresa login(String email, String password) {
+    public EmpresaDto login(String email, String password) {
 
         Empresa emp = empresaRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
@@ -107,6 +108,6 @@ public class EmpresaServiceImpl implements EmpresaService {
             throw new RuntimeException("Contraseña incorrecta");
         }
 
-        return emp;
+        return convertirADto(emp);
     }
 }

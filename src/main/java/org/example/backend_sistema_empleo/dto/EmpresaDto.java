@@ -1,7 +1,9 @@
 package org.example.backend_sistema_empleo.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
 
 @Data
 @NoArgsConstructor
@@ -16,4 +18,7 @@ public class EmpresaDto {
     private String email;
     private String telefono;
     private String ciudad;
+
+    @JsonProperty(access = WRITE_ONLY)
+    private String password;
 }
