@@ -72,7 +72,7 @@ public class PostulacionController {
     // DE UN USUARIO
     // =========================
     @GetMapping("/candidato/{idUsuario}")
-    @PreAuthorize("hasRole('ADMIN') or authentication.name == #idUsuario.toString()")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ESTUDIANTE')")
     public ResponseEntity<List<PostulacionDto>> listarPorUsuario(
             @PathVariable Long idUsuario
     ) {
