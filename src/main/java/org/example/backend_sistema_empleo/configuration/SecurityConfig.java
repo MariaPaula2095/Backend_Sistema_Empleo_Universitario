@@ -88,11 +88,19 @@ public class SecurityConfig {
                         .requestMatchers("/api/ofertas/activas").permitAll()
 
                         // =========================
-                        // ADMIN
+                        // ADMIN Y EMPRESA
                         // =========================
 
                         .requestMatchers("/api/usuarios/listar")
-                        .hasRole("ADMIN")
+                        .hasAnyRole("ADMIN", "EMPRESA")
+
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/usuarios/**")
+                        .hasAnyRole("ADMIN", "EMPRESA")
+
+                        // =========================
+                        // SOLO ADMIN
+                        // =========================
 
                         .requestMatchers("/api/empresas-pendientes/listar")
                         .hasRole("ADMIN")
@@ -134,6 +142,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/postulaciones/guardar")
                         .hasRole("ESTUDIANTE")
+
+                        // =========================
+                        // CUALQUIER OTRO ENDPOINT
+                        // =========================
 
                         .anyRequest().authenticated()
                 )
