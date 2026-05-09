@@ -27,7 +27,6 @@ public class UsuarioController {
 
     // 👑 SOLO ADMIN
     @GetMapping("/listar")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UsuarioDto>> listar() {
         return ResponseEntity.ok(usuarioService.listar());
     }
@@ -76,7 +75,7 @@ public class UsuarioController {
 
     // 🎓 el estudiante SOLO puede ver SU correo
     @GetMapping("/buscar-email")
-    @PreAuthorize("hasRole('ADMIN') or authentication.name == #email")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPRESA') or authentication.name == #email")
     public ResponseEntity<UsuarioDto> buscarPorEmail(@RequestParam String email) {
         return ResponseEntity.ok(usuarioService.buscarPorEmail(email));
     }
