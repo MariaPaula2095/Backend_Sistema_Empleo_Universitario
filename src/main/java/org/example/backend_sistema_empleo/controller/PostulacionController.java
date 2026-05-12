@@ -60,7 +60,7 @@ public class PostulacionController {
     // SOLO ADMIN
     // =========================
     @DeleteMapping("/eliminar/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ESTUDIANTE')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
 
         postulacionService.eliminar(id);
