@@ -49,7 +49,7 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
 
         emp.setPassword(passwordEncoder.encode(emp.getPassword()));
         emp.setEstado("PENDIENTE");
-        emp.setMensaje("En revisión por el administrador");
+        emp.setMensaje("Tu solicitud está en revisión por el administrador");
 
         return repo.save(emp);
     }
@@ -60,32 +60,45 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
     }
 
     @Override
-    public EmpresaPendiente aprobar(Long id) {
+    public EmpresaPendiente aprobar(Long id, String mensaje) {
 
         EmpresaPendiente emp = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
 
         emp.setEstado("APROBADA");
-        emp.setMensaje("Empresa aprobada por el administrador");
 
-        // Crear empresa en tabla empresa con la contraseña que registró
+        // Si el admin escribió mensaje, se guarda
+        if (mensaje != null && !mensaje.isBlank()) {
+            emp.setMensaje(mensaje);
+        } else {
+            emp.setMensaje("Empresa aprobada por el administrador");
+        }
+
+        // Crear empresa en tabla empresa
         Empresa empresa = new Empresa();
         empresa.setNombre(emp.getNombre());
         empresa.setEmail(emp.getEmail());
         empresa.setPassword(emp.getPassword());
+
         empresaRepository.save(empresa);
 
         return repo.save(emp);
     }
 
     @Override
-    public EmpresaPendiente rechazar(Long id) {
+    public EmpresaPendiente rechazar(Long id, String mensaje) {
 
         EmpresaPendiente emp = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
 
         emp.setEstado("RECHAZADA");
-        emp.setMensaje("Empresa rechazada por el administrador");
+
+        // Guardar motivo del rechazo
+        if (mensaje != null && !mensaje.isBlank()) {
+            emp.setMensaje(mensaje);
+        } else {
+            emp.setMensaje("Empresa rechazada por el administrador");
+        }
 
         return repo.save(emp);
     }

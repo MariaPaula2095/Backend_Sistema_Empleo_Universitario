@@ -10,7 +10,7 @@ public interface EmpresaPendienteService {
 
     List<EmpresaPendiente> listar();
 
-    EmpresaPendiente aprobar(Long id);
+    EmpresaPendiente aprobar(Long id, String mensaje);
 
-    EmpresaPendiente rechazar(Long id);
+    EmpresaPendiente rechazar(Long id, String mensaje);
 }

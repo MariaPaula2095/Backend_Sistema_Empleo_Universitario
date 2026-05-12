@@ -30,17 +30,23 @@ public class EmpresaPendienteController {
         return service.listar();
     }
 
-    // 👑 ADMIN
+    // 👑 ADMIN APRUEBA
     @PutMapping("/aprobar/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public EmpresaPendiente aprobar(@PathVariable Long id) {
-        return service.aprobar(id);
+    public EmpresaPendiente aprobar(
+            @PathVariable Long id,
+            @RequestParam(required = false) String mensaje
+    ) {
+        return service.aprobar(id, mensaje);
     }
 
-    // 👑 ADMIN
+    // 👑 ADMIN RECHAZA
     @PutMapping("/rechazar/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public EmpresaPendiente rechazar(@PathVariable Long id) {
-        return service.rechazar(id);
+    public EmpresaPendiente rechazar(
+            @PathVariable Long id,
+            @RequestParam(required = false) String mensaje
+    ) {
+        return service.rechazar(id, mensaje);
     }
 }

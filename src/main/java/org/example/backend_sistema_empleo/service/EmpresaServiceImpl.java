@@ -2,9 +2,13 @@ package org.example.backend_sistema_empleo.service;
 
 import org.example.backend_sistema_empleo.dto.EmpresaDto;
 import org.example.backend_sistema_empleo.model.Empresa;
+import org.example.backend_sistema_empleo.model.EmpresaPendiente;
+import org.example.backend_sistema_empleo.repository.EmpresaPendienteRepository;
 import org.example.backend_sistema_empleo.repository.EmpresaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,11 +17,15 @@ import java.util.stream.Collectors;
 public class EmpresaServiceImpl implements EmpresaService {
 
     private final EmpresaRepository empresaRepository;
+    private final EmpresaPendienteRepository empresaPendienteRepository;
     private final PasswordEncoder passwordEncoder;
 
     public EmpresaServiceImpl(EmpresaRepository empresaRepository,
+                              EmpresaPendienteRepository empresaPendienteRepository,
                               PasswordEncoder passwordEncoder) {
+
         this.empresaRepository = empresaRepository;
+        this.empresaPendienteRepository = empresaPendienteRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -35,7 +43,9 @@ public class EmpresaServiceImpl implements EmpresaService {
     }
 
     private Empresa convertirAEntity(EmpresaDto dto) {
+
         Empresa e = new Empresa();
+
         e.setIdEmpresa(dto.getIdEmpresa());
         e.setNombre(dto.getNombre());
         e.setSector(dto.getSector());
@@ -50,6 +60,7 @@ public class EmpresaServiceImpl implements EmpresaService {
 
     @Override
     public List<EmpresaDto> listar() {
+
         return empresaRepository.findAll()
                 .stream()
                 .map(this::convertirADto)
@@ -61,7 +72,6 @@ public class EmpresaServiceImpl implements EmpresaService {
 
         Empresa empresa = convertirAEntity(dto);
 
-        // 🔐 password obligatoria en creación
         if (empresa.getPassword() != null) {
             empresa.setPassword(passwordEncoder.encode(empresa.getPassword()));
         }
@@ -92,6 +102,7 @@ public class EmpresaServiceImpl implements EmpresaService {
 
     @Override
     public List<EmpresaDto> listarEmpresasConMasOfertas() {
+
         return empresaRepository.listarEmpresasConMasOfertas()
                 .stream()
                 .map(this::convertirADto)
@@ -101,11 +112,52 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Override
     public EmpresaDto login(String email, String password) {
 
+        // 🔍 Buscar primero en empresas pendientes
+        EmpresaPendiente pendiente = empresaPendienteRepository
+                .findByEmail(email)
+                .orElse(null);
+
+        if (pendiente != null) {
+
+            // Validar contraseña
+            if (!passwordEncoder.matches(password, pendiente.getPassword())) {
+                throw new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Contraseña incorrecta"
+                );
+            }
+
+            // Estado pendiente
+            if ("PENDIENTE".equalsIgnoreCase(pendiente.getEstado())) {
+
+                throw new RuntimeException(
+                        "PENDIENTE: " + pendiente.getMensaje()
+                );
+            }
+
+            // Estado rechazada
+            if ("RECHAZADA".equalsIgnoreCase(pendiente.getEstado())) {
+
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "RECHAZADA: " + pendiente.getMensaje()
+                );
+            }
+        }
+
+        // ✅ Buscar empresa aprobada
         Empresa emp = empresaRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Empresa no encontrada"
+                ));
 
         if (!passwordEncoder.matches(password, emp.getPassword())) {
-            throw new RuntimeException("Contraseña incorrecta");
+
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Contraseña incorrecta"
+            );
         }
 
         return convertirADto(emp);

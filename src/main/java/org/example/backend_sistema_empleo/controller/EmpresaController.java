@@ -49,13 +49,29 @@ public class EmpresaController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody EmpresaDto dto) {
 
-        EmpresaDto empresa = empresaService.login(dto.getEmail(), dto.getPassword());
+        try {
 
-        String token = jwtUtil.generateToken(empresa.getEmail(), "EMPRESA");
+            EmpresaDto empresa = empresaService.login(
+                    dto.getEmail(),
+                    dto.getPassword()
+            );
 
-        return ResponseEntity.ok(Map.of(
-                "token", token,
-                "empresa", empresa
-        ));
+            String token = jwtUtil.generateToken(
+                    empresa.getEmail(),
+                    "EMPRESA"
+            );
+
+            return ResponseEntity.ok(Map.of(
+                    "token", token,
+                    "empresa", empresa
+            ));
+
+        } catch (Exception e) {
+
+            return ResponseEntity.status(403).body(Map.of(
+                    "error", "Forbidden",
+                    "message", e.getMessage()
+            ));
+        }
     }
 }

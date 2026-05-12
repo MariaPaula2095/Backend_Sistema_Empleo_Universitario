@@ -21,12 +21,16 @@ public class EmpresaPendiente {
 
     private String nombre;
 
+    @Column(unique = true)
     private String email;
 
     @JsonProperty(access = WRITE_ONLY)
     private String password;
 
+    // PENDIENTE - APROBADA - RECHAZADA
     private String estado;
 
+    // Mensaje del administrador
+    @Column(length = 500)
     private String mensaje;
 }
