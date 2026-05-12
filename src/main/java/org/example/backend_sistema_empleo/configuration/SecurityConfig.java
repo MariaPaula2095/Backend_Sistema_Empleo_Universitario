@@ -117,7 +117,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/postulaciones/eliminar/**")
-                        .hasRole("ADMIN")
+                        .hasAnyRole("ADMIN", "ESTUDIANTE")
 
                         // =========================
                         // EMPRESA
