@@ -43,21 +43,30 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
 
         validarEmail(emp.getEmail());
 
-        if (emp.getPassword() == null || emp.getPassword().isBlank()) {
-            throw new IllegalArgumentException("La contraseña es obligatoria");
-        }
-
         EmpresaPendiente existente = repo.findByEmail(emp.getEmail())
                 .orElse(null);
 
+        // =========================
         // SI YA EXISTE → ACTUALIZA
+        // =========================
         if (existente != null) {
 
-            existente.setNombre(emp.getNombre());
+            // SOLO ACTUALIZA LOS CAMPOS
+            // QUE LLEGUEN CON INFORMACIÓN
 
-            existente.setPassword(
-                    passwordEncoder.encode(emp.getPassword())
-            );
+            if (emp.getNombre() != null &&
+                    !emp.getNombre().isBlank()) {
+
+                existente.setNombre(emp.getNombre());
+            }
+
+            if (emp.getPassword() != null &&
+                    !emp.getPassword().isBlank()) {
+
+                existente.setPassword(
+                        passwordEncoder.encode(emp.getPassword())
+                );
+            }
 
             existente.setEstado("PENDIENTE");
 
@@ -65,14 +74,27 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
                     "Tu solicitud está en revisión por el administrador"
             );
 
+            // REACTIVAR SOLICITUD
+            existente.setActivo(true);
+
             // IMPORTANTE:
             // NO BORRAR RECHAZOS
-            // NO CAMBIAR ACTIVO
 
             return repo.save(existente);
         }
 
+        // =========================
         // SI NO EXISTE → CREA NUEVO
+        // =========================
+
+        if (emp.getPassword() == null ||
+                emp.getPassword().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "La contraseña es obligatoria"
+            );
+        }
+
         emp.setPassword(
                 passwordEncoder.encode(emp.getPassword())
         );
