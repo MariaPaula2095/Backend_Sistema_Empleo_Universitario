@@ -17,20 +17,20 @@ public class EmpresaPendienteController {
         this.service = service;
     }
 
-    // 🟡 EMPRESA ENVÍA SOLICITUD
+    // EMPRESA ENVÍA SOLICITUD
     @PostMapping("/enviar")
     public EmpresaPendiente enviar(@RequestBody EmpresaPendiente emp) {
         return service.crear(emp);
     }
 
-    // 👑 ADMIN
+    // ADMIN
     @GetMapping("/listar")
     @PreAuthorize("hasRole('ADMIN')")
     public List<EmpresaPendiente> listar() {
         return service.listar();
     }
 
-    // 👑 ADMIN APRUEBA
+    // ADMIN APRUEBA
     @PutMapping("/aprobar/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public EmpresaPendiente aprobar(
@@ -40,7 +40,7 @@ public class EmpresaPendienteController {
         return service.aprobar(id, mensaje);
     }
 
-    // 👑 ADMIN RECHAZA
+    // ADMIN RECHAZA
     @PutMapping("/rechazar/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public EmpresaPendiente rechazar(
@@ -48,5 +48,12 @@ public class EmpresaPendienteController {
             @RequestParam(required = false) String mensaje
     ) {
         return service.rechazar(id, mensaje);
+    }
+
+    // ADMIN ELIMINA EMPRESA
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void eliminarPendiente(@PathVariable Long id) {
+        service.eliminarPendiente(id);
     }
 }

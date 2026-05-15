@@ -1,7 +1,9 @@
 package org.example.backend_sistema_empleo.repository;
 
+import jakarta.transaction.Transactional;
 import org.example.backend_sistema_empleo.model.Empresa;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -21,4 +23,9 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
         ORDER BY COUNT(o.id) DESC
     """, nativeQuery = true)
     List<Empresa> listarEmpresasConMasOfertas();
+
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM empresa WHERE id_empresa = :id", nativeQuery = true)
+    void eliminarEmpresa(@Param("id") Long id);
 }

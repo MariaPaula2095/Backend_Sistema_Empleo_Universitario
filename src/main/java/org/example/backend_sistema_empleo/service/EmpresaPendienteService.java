@@ -13,4 +13,8 @@ public interface EmpresaPendienteService {
     EmpresaPendiente aprobar(Long id, String mensaje);
 
     EmpresaPendiente rechazar(Long id, String mensaje);
+
+    void eliminarEmpresa(Long id);
+
+    void eliminarPendiente(Long id);
 }

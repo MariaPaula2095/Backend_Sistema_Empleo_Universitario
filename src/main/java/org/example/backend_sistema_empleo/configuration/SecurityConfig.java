@@ -111,13 +111,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/empresas-pendientes/rechazar/**")
                         .hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/postulaciones/listar")
+                        .requestMatchers(HttpMethod.DELETE,
+                                        "/api/empresas-pendientes/**")
                         .hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/api/postulaciones/eliminar/**")
-                        .hasAnyRole("ADMIN", "ESTUDIANTE")
+                        .requestMatchers(HttpMethod.GET,
+                                        "/api/postulaciones/listar")
+                        .hasRole("ADMIN")
 
                         // =========================
                         // EMPRESA

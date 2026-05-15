@@ -17,10 +17,16 @@ public class Empresa {
     private Long idEmpresa;
 
     private String nombre;
+
     private String sector;
+
     private String descripcion;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
     private String telefono;
+
     private String ciudad;
 
     private String password;
@@ -30,6 +36,7 @@ public class Empresa {
 
     @PrePersist
     public void prePersist() {
+
         if (this.rol == null) {
             this.rol = Rol.EMPRESA;
         }

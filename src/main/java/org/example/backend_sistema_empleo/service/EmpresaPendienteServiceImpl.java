@@ -47,9 +47,45 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
             throw new IllegalArgumentException("La contraseña es obligatoria");
         }
 
-        emp.setPassword(passwordEncoder.encode(emp.getPassword()));
+        EmpresaPendiente existente = repo.findByEmail(emp.getEmail())
+                .orElse(null);
+
+        // SI YA EXISTE → ACTUALIZA
+        if (existente != null) {
+
+            existente.setNombre(emp.getNombre());
+
+            existente.setPassword(
+                    passwordEncoder.encode(emp.getPassword())
+            );
+
+            existente.setEstado("PENDIENTE");
+
+            existente.setMensaje(
+                    "Tu solicitud está en revisión por el administrador"
+            );
+
+            // IMPORTANTE:
+            // NO BORRAR RECHAZOS
+            // NO CAMBIAR ACTIVO
+
+            return repo.save(existente);
+        }
+
+        // SI NO EXISTE → CREA NUEVO
+        emp.setPassword(
+                passwordEncoder.encode(emp.getPassword())
+        );
+
         emp.setEstado("PENDIENTE");
-        emp.setMensaje("Tu solicitud está en revisión por el administrador");
+
+        emp.setMensaje(
+                "Tu solicitud está en revisión por el administrador"
+        );
+
+        emp.setRechazos(0);
+
+        emp.setActivo(true);
 
         return repo.save(emp);
     }
@@ -63,24 +99,38 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
     public EmpresaPendiente aprobar(Long id, String mensaje) {
 
         EmpresaPendiente emp = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
+                .orElseThrow(() ->
+                        new RuntimeException("Empresa no encontrada"));
 
         emp.setEstado("APROBADA");
 
-        // Si el admin escribió mensaje, se guarda
+        // DESACTIVAR SOLICITUD
+        emp.setActivo(false);
+
         if (mensaje != null && !mensaje.isBlank()) {
             emp.setMensaje(mensaje);
         } else {
             emp.setMensaje("Empresa aprobada por el administrador");
         }
 
-        // Crear empresa en tabla empresa
-        Empresa empresa = new Empresa();
-        empresa.setNombre(emp.getNombre());
-        empresa.setEmail(emp.getEmail());
-        empresa.setPassword(emp.getPassword());
+        // VALIDAR SI YA EXISTE EMPRESA
+        Empresa empresaExistente = empresaRepository
+                .findByEmail(emp.getEmail())
+                .orElse(null);
 
-        empresaRepository.save(empresa);
+        // SOLO CREAR SI NO EXISTE
+        if (empresaExistente == null) {
+
+            Empresa empresa = new Empresa();
+
+            empresa.setNombre(emp.getNombre());
+
+            empresa.setEmail(emp.getEmail());
+
+            empresa.setPassword(emp.getPassword());
+
+            empresaRepository.save(empresa);
+        }
 
         return repo.save(emp);
     }
@@ -89,11 +139,14 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
     public EmpresaPendiente rechazar(Long id, String mensaje) {
 
         EmpresaPendiente emp = repo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
+                .orElseThrow(() ->
+                        new RuntimeException("Empresa no encontrada"));
 
         emp.setEstado("RECHAZADA");
 
-        // Guardar motivo del rechazo
+        // SUMAR RECHAZOS
+        emp.setRechazos(emp.getRechazos() + 1);
+
         if (mensaje != null && !mensaje.isBlank()) {
             emp.setMensaje(mensaje);
         } else {
@@ -102,4 +155,24 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
 
         return repo.save(emp);
     }
+
+    @Override
+    public void eliminarEmpresa(Long id) {
+
+        Empresa empresa = empresaRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Empresa no encontrada"));
+
+        empresaRepository.delete(empresa);
+    }
+    @Override
+    public void eliminarPendiente(Long id) {
+
+        EmpresaPendiente emp = repo.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Solicitud no encontrada"));
+
+        repo.delete(emp);
+    }
+
 }

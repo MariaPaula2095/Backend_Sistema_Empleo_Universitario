@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
-
 @Entity
 @Table(name = "empresa_pendiente")
 @Getter
@@ -30,7 +29,10 @@ public class EmpresaPendiente {
     // PENDIENTE - APROBADA - RECHAZADA
     private String estado;
 
-    // Mensaje del administrador
     @Column(length = 500)
     private String mensaje;
+
+    private Integer rechazos = 0;
+
+    private Boolean activo = true;
 }
