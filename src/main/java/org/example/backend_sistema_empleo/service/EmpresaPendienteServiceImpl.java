@@ -102,6 +102,11 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
                 .orElseThrow(() ->
                         new RuntimeException("Empresa no encontrada"));
 
+        // EVITAR APROBAR DOS VECES
+        if ("APROBADA".equals(emp.getEstado())) {
+            throw new RuntimeException("La empresa ya fue aprobada");
+        }
+
         emp.setEstado("APROBADA");
 
         // DESACTIVAR SOLICITUD
@@ -136,16 +141,30 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
     }
 
     @Override
-    public EmpresaPendiente rechazar(Long id, String mensaje) {
+    public String rechazar(Long id, String mensaje) {
 
         EmpresaPendiente emp = repo.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Empresa no encontrada"));
 
-        emp.setEstado("RECHAZADA");
+        Integer rechazosActuales =
+                emp.getRechazos() != null
+                        ? emp.getRechazos()
+                        : 0;
 
-        // SUMAR RECHAZOS
-        emp.setRechazos(emp.getRechazos() + 1);
+        rechazosActuales++;
+
+        // SI LLEGA A 3 → ELIMINAR
+        if (rechazosActuales >= 3) {
+
+            repo.delete(emp);
+
+            return "Empresa eliminada por alcanzar 3 rechazos";
+        }
+
+        emp.setRechazos(rechazosActuales);
+
+        emp.setEstado("RECHAZADA");
 
         if (mensaje != null && !mensaje.isBlank()) {
             emp.setMensaje(mensaje);
@@ -153,7 +172,10 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
             emp.setMensaje("Empresa rechazada por el administrador");
         }
 
-        return repo.save(emp);
+        repo.save(emp);
+
+        return "Empresa rechazada correctamente. Intento "
+                + rechazosActuales + " de 3";
     }
 
     @Override
@@ -165,6 +187,7 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
 
         empresaRepository.delete(empresa);
     }
+
     @Override
     public void eliminarPendiente(Long id) {
 
@@ -174,5 +197,4 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
 
         repo.delete(emp);
     }
-
 }
