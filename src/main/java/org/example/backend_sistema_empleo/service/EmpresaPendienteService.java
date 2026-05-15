@@ -17,4 +17,6 @@ public interface EmpresaPendienteService {
     void eliminarEmpresa(Long id);
 
     void eliminarPendiente(Long id);
+
+    EmpresaPendiente actualizar(EmpresaPendiente emp);
 }

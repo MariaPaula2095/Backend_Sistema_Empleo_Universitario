@@ -24,6 +24,14 @@ public class EmpresaPendienteController {
         return service.crear(emp);
     }
 
+    // EMPRESA ACTUALIZA SOLICITUD
+    @PutMapping("/actualizar")
+    public EmpresaPendiente actualizar(
+            @RequestBody EmpresaPendiente emp
+    ) {
+        return service.actualizar(emp);
+    }
+
     // ADMIN
     @GetMapping("/listar")
     @PreAuthorize("hasRole('ADMIN')")

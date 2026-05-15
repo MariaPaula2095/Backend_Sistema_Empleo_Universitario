@@ -219,4 +219,43 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
 
         repo.delete(emp);
     }
+
+    @Override
+    public EmpresaPendiente actualizar(EmpresaPendiente emp) {
+
+        if (emp.getEmail() == null || emp.getEmail().isBlank()) {
+            throw new RuntimeException("El email es obligatorio");
+        }
+
+        EmpresaPendiente existente = repo.findByEmail(emp.getEmail())
+                .orElseThrow(() ->
+                        new RuntimeException("No existe una solicitud con ese email"));
+
+        // SOLO ACTUALIZA CAMPOS ENVIADOS
+
+        if (emp.getNombre() != null &&
+                !emp.getNombre().isBlank()) {
+
+            existente.setNombre(emp.getNombre());
+        }
+
+        if (emp.getPassword() != null &&
+                !emp.getPassword().isBlank()) {
+
+            existente.setPassword(
+                    passwordEncoder.encode(emp.getPassword())
+            );
+        }
+
+        // VOLVER A PENDIENTE
+        existente.setEstado("PENDIENTE");
+
+        existente.setMensaje(
+                "Tu solicitud fue actualizada y está nuevamente en revisión"
+        );
+
+        existente.setActivo(true);
+
+        return repo.save(existente);
+    }
 }
