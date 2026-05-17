@@ -73,35 +73,14 @@ public class PerfilServiceImpl implements PerfilService {
         Perfil perfil = perfilRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("No existe el perfil"));
 
-        if (dto.getCarrera() != null) {
-            perfil.setCarrera(dto.getCarrera());
-        }
+        if (dto.getCarrera() != null) perfil.setCarrera(dto.getCarrera());
+        if (dto.getUniversidad() != null) perfil.setUniversidad(dto.getUniversidad());
+        if (dto.getSemestre() != null) perfil.setSemestre(dto.getSemestre());
+        if (dto.getHabilidades() != null) perfil.setHabilidades(dto.getHabilidades());
+        if (dto.getExperiencia() != null) perfil.setExperiencia(dto.getExperiencia());
+        if (dto.getCvUrl() != null) perfil.setCvUrl(dto.getCvUrl());
+        if (dto.getDisponibilidad() != null) perfil.setDisponibilidad(dto.getDisponibilidad());
 
-        if (dto.getUniversidad() != null) {
-            perfil.setUniversidad(dto.getUniversidad());
-        }
-
-        if (dto.getSemestre() != null) {
-            perfil.setSemestre(dto.getSemestre());
-        }
-
-        if (dto.getHabilidades() != null) {
-            perfil.setHabilidades(dto.getHabilidades());
-        }
-
-        if (dto.getExperiencia() != null) {
-            perfil.setExperiencia(dto.getExperiencia());
-        }
-
-        if (dto.getCvUrl() != null) {
-            perfil.setCvUrl(dto.getCvUrl());
-        }
-
-        if (dto.getDisponibilidad() != null) {
-            perfil.setDisponibilidad(dto.getDisponibilidad());
-        }
-
-        // Solo cambiar usuario si viene uno nuevo
         if (dto.getIdUsuario() != null) {
             Usuario usuario = usuarioRepository.findById(dto.getIdUsuario())
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -130,5 +109,14 @@ public class PerfilServiceImpl implements PerfilService {
                 .stream()
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PerfilDto buscarPorEmail(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Perfil perfil = perfilRepository.findByUsuario(usuario)
+                .orElseThrow(() -> new RuntimeException("Perfil no encontrado"));
+        return convertirADto(perfil);
     }
 }

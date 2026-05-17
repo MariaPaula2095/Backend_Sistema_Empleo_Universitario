@@ -2,6 +2,9 @@ package org.example.backend_sistema_empleo.controller;
 
 import org.example.backend_sistema_empleo.dto.PerfilDto;
 import org.example.backend_sistema_empleo.service.PerfilService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +22,11 @@ public class PerfilController {
     @GetMapping("/listar")
     public List<PerfilDto> listar() {
         return perfilService.listar();
+    }
+
+    @GetMapping("/mi-perfil")
+    public ResponseEntity<PerfilDto> miPerfil(@AuthenticationPrincipal UserDetails user) {
+        return ResponseEntity.ok(perfilService.buscarPorEmail(user.getUsername()));
     }
 
     @PostMapping("/guardar")

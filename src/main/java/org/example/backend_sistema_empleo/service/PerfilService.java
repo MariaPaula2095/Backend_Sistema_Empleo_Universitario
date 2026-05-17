@@ -17,4 +17,6 @@ public interface PerfilService {
     List<PerfilDto> buscarPorCarrera(String carrera);
 
     List<PerfilDto> buscarPorHabilidad(String habilidad);
+
+    PerfilDto buscarPorEmail(String email);
 }
