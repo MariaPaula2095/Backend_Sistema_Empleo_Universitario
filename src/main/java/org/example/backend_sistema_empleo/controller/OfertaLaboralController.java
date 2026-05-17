@@ -19,7 +19,6 @@ public class OfertaLaboralController {
 
     // 👤 todos ven
     @GetMapping("/listar")
-    @PreAuthorize("hasAnyRole('ADMIN','ESTUDIANTE','EMPRESA')")
     public List<OfertaLaboralDto> listar() {
         return ofertaService.listar();
     }
