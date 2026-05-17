@@ -17,7 +17,6 @@ public class OfertaLaboralController {
         this.ofertaService = ofertaService;
     }
 
-    // 👤 todos ven
     @GetMapping("/listar")
     public List<OfertaLaboralDto> listar() {
         return ofertaService.listar();
