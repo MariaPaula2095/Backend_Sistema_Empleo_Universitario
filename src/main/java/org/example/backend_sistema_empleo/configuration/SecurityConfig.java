@@ -38,7 +38,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config
     ) throws Exception {
-
         return config.getAuthenticationManager();
     }
 
@@ -47,13 +46,10 @@ public class SecurityConfig {
 
         http
                 .cors(Customizer.withDefaults())
-
                 .csrf(csrf -> csrf.disable())
-
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
                 .authorizeHttpRequests(auth -> auth
 
                         // =========================
@@ -73,7 +69,6 @@ public class SecurityConfig {
                         // =========================
                         // ENDPOINTS PUBLICOS
                         // =========================
-
                         .requestMatchers("/api/usuarios/guardar").permitAll()
                         .requestMatchers("/api/usuarios/login").permitAll()
                         .requestMatchers("/api/usuarios/recuperar-password").permitAll()
@@ -88,9 +83,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/ofertas/activas").permitAll()
 
                         // =========================
+                        // PERFILES - ESTUDIANTE
+                        // =========================
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/perfiles/mi-perfil")
+                        .hasAnyRole("ADMIN", "EMPRESA", "ESTUDIANTE")
+
+                        // =========================
                         // ADMIN Y EMPRESA
                         // =========================
-
                         .requestMatchers("/api/usuarios/listar")
                         .hasAnyRole("ADMIN", "EMPRESA")
 
@@ -101,7 +102,6 @@ public class SecurityConfig {
                         // =========================
                         // SOLO ADMIN
                         // =========================
-
                         .requestMatchers("/api/empresas-pendientes/listar")
                         .hasRole("ADMIN")
 
@@ -112,17 +112,16 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.DELETE,
-                                        "/api/empresas-pendientes/**")
+                                "/api/empresas-pendientes/**")
                         .hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.GET,
-                                        "/api/postulaciones/listar")
+                                "/api/postulaciones/listar")
                         .hasRole("ADMIN")
 
                         // =========================
                         // EMPRESA
                         // =========================
-
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/postulaciones/actualizar/**")
                         .hasAnyRole("ADMIN", "EMPRESA", "ESTUDIANTE")
@@ -138,7 +137,6 @@ public class SecurityConfig {
                         // =========================
                         // ESTUDIANTE
                         // =========================
-
                         .requestMatchers(HttpMethod.POST,
                                 "/api/postulaciones/guardar")
                         .hasRole("ESTUDIANTE")
@@ -146,10 +144,8 @@ public class SecurityConfig {
                         // =========================
                         // CUALQUIER OTRO ENDPOINT
                         // =========================
-
                         .anyRequest().authenticated()
                 )
-
                 .addFilterBefore(
                         jwtFilter(),
                         UsernamePasswordAuthenticationFilter.class
