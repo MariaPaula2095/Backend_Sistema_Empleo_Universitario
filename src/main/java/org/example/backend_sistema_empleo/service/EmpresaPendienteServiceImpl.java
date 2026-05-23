@@ -43,26 +43,18 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
         EmpresaPendiente existente = repo.findByEmail(emp.getEmail())
                 .orElse(null);
 
-        // =========================
-        // SI YA EXISTE → ACTUALIZA
-        // =========================
         if (existente != null) {
 
             if (emp.getNombre() != null && !emp.getNombre().isBlank())
                 existente.setNombre(emp.getNombre());
-
             if (emp.getPassword() != null && !emp.getPassword().isBlank())
                 existente.setPassword(passwordEncoder.encode(emp.getPassword()));
-
             if (emp.getSector() != null && !emp.getSector().isBlank())
                 existente.setSector(emp.getSector());
-
             if (emp.getTelefono() != null && !emp.getTelefono().isBlank())
                 existente.setTelefono(emp.getTelefono());
-
             if (emp.getCiudad() != null && !emp.getCiudad().isBlank())
                 existente.setCiudad(emp.getCiudad());
-
             if (emp.getDescripcion() != null && !emp.getDescripcion().isBlank())
                 existente.setDescripcion(emp.getDescripcion());
 
@@ -73,9 +65,6 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
             return repo.save(existente);
         }
 
-        // =========================
-        // SI NO EXISTE → CREA NUEVO
-        // =========================
         if (emp.getPassword() == null || emp.getPassword().isBlank()) {
             throw new IllegalArgumentException("La contraseña es obligatoria");
         }
@@ -118,7 +107,6 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
                 .orElse(null);
 
         if (empresaExistente == null) {
-            // CREAR EMPRESA CON TODOS LOS CAMPOS
             Empresa empresa = new Empresa();
             empresa.setNombre(emp.getNombre());
             empresa.setEmail(emp.getEmail());
@@ -127,13 +115,20 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
             empresa.setTelefono(emp.getTelefono());
             empresa.setCiudad(emp.getCiudad());
             empresa.setDescripcion(emp.getDescripcion());
+            // COPIAR DOCUMENTO
+            empresa.setDocumento(emp.getDocumento());
+            empresa.setDocumentoTipo(emp.getDocumentoTipo());
+            empresa.setDocumentoNombre(emp.getDocumentoNombre());
             empresaRepository.save(empresa);
         } else {
-            // SI YA EXISTE → ACTUALIZAR CAMPOS DEL PERFIL
             empresaExistente.setSector(emp.getSector());
             empresaExistente.setTelefono(emp.getTelefono());
             empresaExistente.setCiudad(emp.getCiudad());
             empresaExistente.setDescripcion(emp.getDescripcion());
+            // COPIAR DOCUMENTO
+            empresaExistente.setDocumento(emp.getDocumento());
+            empresaExistente.setDocumentoTipo(emp.getDocumentoTipo());
+            empresaExistente.setDocumentoNombre(emp.getDocumentoNombre());
             empresaRepository.save(empresaExistente);
         }
 
@@ -192,7 +187,6 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
         EmpresaPendiente existente = repo.findByEmail(emp.getEmail())
                 .orElseThrow(() -> new RuntimeException("No existe una solicitud con ese email"));
 
-        // SOLO ACTUALIZA CAMPOS ENVIADOS
         if (emp.getNombre() != null && !emp.getNombre().isBlank())
             existente.setNombre(emp.getNombre());
         if (emp.getSector() != null && !emp.getSector().isBlank())

@@ -78,6 +78,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/empresas/top").permitAll()
 
                         .requestMatchers("/api/empresas-pendientes/enviar").permitAll()
+                        .requestMatchers("/api/empresas-pendientes/actualizar").permitAll()
 
                         .requestMatchers("/api/ofertas/listar").permitAll()
                         .requestMatchers("/api/ofertas/activas").permitAll()
@@ -85,10 +86,9 @@ public class SecurityConfig {
                         // =========================
                         // ARCHIVOS
                         // =========================
-                        // Ver fotos es público (para mostrarlas en el frontend sin token)
                         .requestMatchers(HttpMethod.GET,
                                 "/api/archivos/foto/**").permitAll()
-                        // Subir requiere autenticación (el rol lo controla @PreAuthorize)
+                        .requestMatchers("/api/archivos/documento/empresa-pendiente/**").permitAll()
                         .requestMatchers("/api/archivos/**").authenticated()
 
                         // =========================

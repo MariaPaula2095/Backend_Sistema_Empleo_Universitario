@@ -2,7 +2,9 @@ package org.example.backend_sistema_empleo.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.backend_sistema_empleo.model.Empresa;
+import org.example.backend_sistema_empleo.model.EmpresaPendiente;
 import org.example.backend_sistema_empleo.model.Usuario;
+import org.example.backend_sistema_empleo.repository.EmpresaPendienteRepository;
 import org.example.backend_sistema_empleo.repository.EmpresaRepository;
 import org.example.backend_sistema_empleo.repository.UsuarioRepository;
 import org.springframework.http.*;
@@ -16,6 +18,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ArchivoServiceImpl implements ArchivoService {
+
+    private final EmpresaPendienteRepository empresaPendienteRepository;
 
     private final UsuarioRepository usuarioRepository;
     private final EmpresaRepository empresaRepository;
@@ -177,5 +181,54 @@ public class ArchivoServiceImpl implements ArchivoService {
         return empresaRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Empresa no encontrada"));
+    }
+    @Override
+    public void subirDocumentoEmpresaPendiente(Long id, MultipartFile archivo) {
+        EmpresaPendiente empresa = empresaPendienteRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Empresa pendiente no encontrada"));
+        try {
+            empresa.setDocumento(archivo.getBytes());
+            empresa.setDocumentoTipo(archivo.getContentType());
+            empresa.setDocumentoNombre(archivo.getOriginalFilename());
+            empresaPendienteRepository.save(empresa);
+        } catch (IOException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, "Error al leer el archivo");
+        }
+    }
+
+    @Override
+    public ResponseEntity<byte[]> obtenerDocumentoEmpresaPendiente(Long id) {
+        EmpresaPendiente empresa = empresaPendienteRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Empresa pendiente no encontrada"));
+        if (empresa.getDocumento() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "La empresa pendiente no tiene documento");
+        }
+        String tipo = (empresa.getDocumentoTipo() != null)
+                ? empresa.getDocumentoTipo()
+                : "application/octet-stream";
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(tipo))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" + empresa.getDocumentoNombre() + "\"")
+                .body(empresa.getDocumento());
+    }
+
+    @Override
+    public void eliminarDocumentoEmpresaPendiente(Long id) {
+        EmpresaPendiente empresa = empresaPendienteRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Empresa pendiente no encontrada"));
+        if (empresa.getDocumento() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "La empresa pendiente no tiene documento para eliminar");
+        }
+        empresa.setDocumento(null);
+        empresa.setDocumentoTipo(null);
+        empresa.setDocumentoNombre(null);
+        empresaPendienteRepository.save(empresa);
     }
 }

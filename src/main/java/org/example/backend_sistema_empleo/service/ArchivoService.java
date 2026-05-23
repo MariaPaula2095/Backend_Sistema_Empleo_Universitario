@@ -15,4 +15,8 @@ public interface ArchivoService {
     void eliminarFotoUsuario(Long idUsuario);
     void eliminarFotoEmpresa(Long idEmpresa);
     void eliminarDocumentoEmpresa(Long idEmpresa);
+
+    void subirDocumentoEmpresaPendiente(Long id, MultipartFile archivo);
+    ResponseEntity<byte[]> obtenerDocumentoEmpresaPendiente(Long id);
+    void eliminarDocumentoEmpresaPendiente(Long id);
 }

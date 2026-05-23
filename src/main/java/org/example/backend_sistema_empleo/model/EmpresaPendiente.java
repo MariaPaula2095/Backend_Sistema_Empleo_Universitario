@@ -1,5 +1,6 @@
 package org.example.backend_sistema_empleo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,4 +44,15 @@ public class EmpresaPendiente {
     private Integer rechazos = 0;
 
     private Boolean activo = true;
+
+    @JsonIgnore
+    @Column(columnDefinition = "bytea")
+    private byte[] documento;
+
+    @JsonIgnore
+    private String documentoTipo;
+
+    @JsonIgnore
+    private String documentoNombre;
+
 }

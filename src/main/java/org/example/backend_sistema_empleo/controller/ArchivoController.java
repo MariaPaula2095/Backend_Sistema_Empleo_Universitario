@@ -130,4 +130,35 @@ public class ArchivoController {
         archivoService.eliminarDocumentoEmpresa(id);
         return ResponseEntity.ok(Map.of("mensaje", "Documento eliminado correctamente"));
     }
+
+    @Operation(summary = "Subir documento de empresa pendiente")
+    @RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
+    @PostMapping(value = "/documento/empresa-pendiente/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, String>> subirDocumentoEmpresaPendiente(
+            @PathVariable Long id,
+            @RequestParam("archivo") MultipartFile archivo) {
+        archivoService.subirDocumentoEmpresaPendiente(id, archivo);
+        return ResponseEntity.ok(Map.of("mensaje", "Documento subido correctamente"));
+    }
+
+    @GetMapping("/documento/empresa-pendiente/{id}")
+    public ResponseEntity<byte[]> obtenerDocumentoEmpresaPendiente(@PathVariable Long id) {
+        return archivoService.obtenerDocumentoEmpresaPendiente(id);
+    }
+
+    @PutMapping(value = "/documento/empresa-pendiente/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Actualizar documento de empresa pendiente")
+    @RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
+    public ResponseEntity<Map<String, String>> actualizarDocumentoEmpresaPendiente(
+            @PathVariable Long id,
+            @RequestParam("archivo") MultipartFile archivo) {
+        archivoService.subirDocumentoEmpresaPendiente(id, archivo);
+        return ResponseEntity.ok(Map.of("mensaje", "Documento actualizado correctamente"));
+    }
+
+    @DeleteMapping("/documento/empresa-pendiente/{id}")
+    public ResponseEntity<Map<String, String>> eliminarDocumentoEmpresaPendiente(@PathVariable Long id) {
+        archivoService.eliminarDocumentoEmpresaPendiente(id);
+        return ResponseEntity.ok(Map.of("mensaje", "Documento eliminado correctamente"));
+    }
 }
