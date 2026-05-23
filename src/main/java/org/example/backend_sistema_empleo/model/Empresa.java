@@ -41,4 +41,15 @@ public class Empresa {
             this.rol = Rol.EMPRESA;
         }
     }
+
+    @Column(columnDefinition = "bytea")
+    private byte[] fotoPerfil;
+
+    private String fotoPerfilTipo;
+
+    @Column(columnDefinition = "bytea")
+    private byte[] documento;
+
+    private String documentoTipo; // ej: "application/pdf"
+    private String documentoNombre; // nombre original del archivo
 }

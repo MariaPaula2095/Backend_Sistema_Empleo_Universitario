@@ -59,4 +59,8 @@ public class Usuario {
             this.tipoUsuario = Rol.ESTUDIANTE;
         }
     }
+    @Column(columnDefinition = "bytea")
+    private byte[] fotoPerfil;
+
+    private String fotoPerfilTipo; // ej: "image/png"
 }

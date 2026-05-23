@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
+
 @Entity
 @Table(name = "empresa_pendiente")
 @Getter
@@ -25,6 +26,13 @@ public class EmpresaPendiente {
 
     @JsonProperty(access = WRITE_ONLY)
     private String password;
+
+    private String sector;
+    private String telefono;
+    private String ciudad;
+
+    @Column(length = 1000)
+    private String descripcion;
 
     // PENDIENTE - APROBADA - RECHAZADA
     private String estado;

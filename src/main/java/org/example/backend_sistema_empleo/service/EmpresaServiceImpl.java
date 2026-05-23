@@ -38,6 +38,7 @@ public class EmpresaServiceImpl implements EmpresaService {
                 e.getEmail(),
                 e.getTelefono(),
                 e.getCiudad(),
+                e.getRol() != null ? e.getRol().name() : "EMPRESA",
                 null
         );
     }
@@ -81,16 +82,18 @@ public class EmpresaServiceImpl implements EmpresaService {
 
     @Override
     public EmpresaDto actualizar(Long id, EmpresaDto dto) {
-
         Empresa empresa = empresaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("No existe la empresa"));
 
-        empresa.setNombre(dto.getNombre());
-        empresa.setSector(dto.getSector());
-        empresa.setDescripcion(dto.getDescripcion());
-        empresa.setEmail(dto.getEmail());
-        empresa.setTelefono(dto.getTelefono());
-        empresa.setCiudad(dto.getCiudad());
+        // Solo actualiza estos campos, nunca nombre/email/password
+        if (dto.getSector() != null && !dto.getSector().isBlank())
+            empresa.setSector(dto.getSector());
+        if (dto.getDescripcion() != null && !dto.getDescripcion().isBlank())
+            empresa.setDescripcion(dto.getDescripcion());
+        if (dto.getTelefono() != null && !dto.getTelefono().isBlank())
+            empresa.setTelefono(dto.getTelefono());
+        if (dto.getCiudad() != null && !dto.getCiudad().isBlank())
+            empresa.setCiudad(dto.getCiudad());
 
         return convertirADto(empresaRepository.save(empresa));
     }

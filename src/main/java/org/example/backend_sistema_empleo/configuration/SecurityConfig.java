@@ -83,6 +83,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/ofertas/activas").permitAll()
 
                         // =========================
+                        // ARCHIVOS
+                        // =========================
+                        // Ver fotos es público (para mostrarlas en el frontend sin token)
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/archivos/foto/**").permitAll()
+                        // Subir requiere autenticación (el rol lo controla @PreAuthorize)
+                        .requestMatchers("/api/archivos/**").authenticated()
+
+                        // =========================
                         // PERFILES - ESTUDIANTE
                         // =========================
                         .requestMatchers(HttpMethod.GET,

@@ -18,6 +18,7 @@ public class EmpresaDto {
     private String email;
     private String telefono;
     private String ciudad;
+    private String rol;
 
     @JsonProperty(access = WRITE_ONLY)
     private String password;

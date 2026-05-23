@@ -25,14 +25,11 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
     }
 
     private void validarEmail(String email) {
-
         if (email == null) {
             throw new IllegalArgumentException("Email no puede ser nulo");
         }
-
         String regex =
                 "^[A-Za-z0-9._%+-]+@(?!gmail\\.com$|hotmail\\.com$|outlook\\.com$)[A-Za-z0-9.-]+\\.(com|co|net)$";
-
         if (!email.matches(regex)) {
             throw new IllegalArgumentException("Solo correos empresariales (.com, .co, .net)");
         }
@@ -51,34 +48,27 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
         // =========================
         if (existente != null) {
 
-            // SOLO ACTUALIZA LOS CAMPOS
-            // QUE LLEGUEN CON INFORMACIÓN
-
-            if (emp.getNombre() != null &&
-                    !emp.getNombre().isBlank()) {
-
+            if (emp.getNombre() != null && !emp.getNombre().isBlank())
                 existente.setNombre(emp.getNombre());
-            }
 
-            if (emp.getPassword() != null &&
-                    !emp.getPassword().isBlank()) {
+            if (emp.getPassword() != null && !emp.getPassword().isBlank())
+                existente.setPassword(passwordEncoder.encode(emp.getPassword()));
 
-                existente.setPassword(
-                        passwordEncoder.encode(emp.getPassword())
-                );
-            }
+            if (emp.getSector() != null && !emp.getSector().isBlank())
+                existente.setSector(emp.getSector());
+
+            if (emp.getTelefono() != null && !emp.getTelefono().isBlank())
+                existente.setTelefono(emp.getTelefono());
+
+            if (emp.getCiudad() != null && !emp.getCiudad().isBlank())
+                existente.setCiudad(emp.getCiudad());
+
+            if (emp.getDescripcion() != null && !emp.getDescripcion().isBlank())
+                existente.setDescripcion(emp.getDescripcion());
 
             existente.setEstado("PENDIENTE");
-
-            existente.setMensaje(
-                    "Tu solicitud está en revisión por el administrador"
-            );
-
-            // REACTIVAR SOLICITUD
+            existente.setMensaje("Tu solicitud está en revisión por el administrador");
             existente.setActivo(true);
-
-            // IMPORTANTE:
-            // NO BORRAR RECHAZOS
 
             return repo.save(existente);
         }
@@ -86,27 +76,14 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
         // =========================
         // SI NO EXISTE → CREA NUEVO
         // =========================
-
-        if (emp.getPassword() == null ||
-                emp.getPassword().isBlank()) {
-
-            throw new IllegalArgumentException(
-                    "La contraseña es obligatoria"
-            );
+        if (emp.getPassword() == null || emp.getPassword().isBlank()) {
+            throw new IllegalArgumentException("La contraseña es obligatoria");
         }
 
-        emp.setPassword(
-                passwordEncoder.encode(emp.getPassword())
-        );
-
+        emp.setPassword(passwordEncoder.encode(emp.getPassword()));
         emp.setEstado("PENDIENTE");
-
-        emp.setMensaje(
-                "Tu solicitud está en revisión por el administrador"
-        );
-
+        emp.setMensaje("Tu solicitud está en revisión por el administrador");
         emp.setRechazos(0);
-
         emp.setActivo(true);
 
         return repo.save(emp);
@@ -121,17 +98,13 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
     public EmpresaPendiente aprobar(Long id, String mensaje) {
 
         EmpresaPendiente emp = repo.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Empresa no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
 
-        // EVITAR APROBAR DOS VECES
         if ("APROBADA".equals(emp.getEstado())) {
             throw new RuntimeException("La empresa ya fue aprobada");
         }
 
         emp.setEstado("APROBADA");
-
-        // DESACTIVAR SOLICITUD
         emp.setActivo(false);
 
         if (mensaje != null && !mensaje.isBlank()) {
@@ -140,23 +113,28 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
             emp.setMensaje("Empresa aprobada por el administrador");
         }
 
-        // VALIDAR SI YA EXISTE EMPRESA
         Empresa empresaExistente = empresaRepository
                 .findByEmail(emp.getEmail())
                 .orElse(null);
 
-        // SOLO CREAR SI NO EXISTE
         if (empresaExistente == null) {
-
+            // CREAR EMPRESA CON TODOS LOS CAMPOS
             Empresa empresa = new Empresa();
-
             empresa.setNombre(emp.getNombre());
-
             empresa.setEmail(emp.getEmail());
-
             empresa.setPassword(emp.getPassword());
-
+            empresa.setSector(emp.getSector());
+            empresa.setTelefono(emp.getTelefono());
+            empresa.setCiudad(emp.getCiudad());
+            empresa.setDescripcion(emp.getDescripcion());
             empresaRepository.save(empresa);
+        } else {
+            // SI YA EXISTE → ACTUALIZAR CAMPOS DEL PERFIL
+            empresaExistente.setSector(emp.getSector());
+            empresaExistente.setTelefono(emp.getTelefono());
+            empresaExistente.setCiudad(emp.getCiudad());
+            empresaExistente.setDescripcion(emp.getDescripcion());
+            empresaRepository.save(empresaExistente);
         }
 
         return repo.save(emp);
@@ -166,26 +144,17 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
     public String rechazar(Long id, String mensaje) {
 
         EmpresaPendiente emp = repo.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Empresa no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
 
-        Integer rechazosActuales =
-                emp.getRechazos() != null
-                        ? emp.getRechazos()
-                        : 0;
-
+        Integer rechazosActuales = emp.getRechazos() != null ? emp.getRechazos() : 0;
         rechazosActuales++;
 
-        // SI LLEGA A 3 → ELIMINAR
         if (rechazosActuales >= 3) {
-
             repo.delete(emp);
-
             return "Empresa eliminada por alcanzar 3 rechazos";
         }
 
         emp.setRechazos(rechazosActuales);
-
         emp.setEstado("RECHAZADA");
 
         if (mensaje != null && !mensaje.isBlank()) {
@@ -196,27 +165,20 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
 
         repo.save(emp);
 
-        return "Empresa rechazada correctamente. Intento "
-                + rechazosActuales + " de 3";
+        return "Empresa rechazada correctamente. Intento " + rechazosActuales + " de 3";
     }
 
     @Override
     public void eliminarEmpresa(Long id) {
-
         Empresa empresa = empresaRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Empresa no encontrada"));
-
+                .orElseThrow(() -> new RuntimeException("Empresa no encontrada"));
         empresaRepository.delete(empresa);
     }
 
     @Override
     public void eliminarPendiente(Long id) {
-
         EmpresaPendiente emp = repo.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Solicitud no encontrada"));
-
+                .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
         repo.delete(emp);
     }
 
@@ -228,32 +190,24 @@ public class EmpresaPendienteServiceImpl implements EmpresaPendienteService {
         }
 
         EmpresaPendiente existente = repo.findByEmail(emp.getEmail())
-                .orElseThrow(() ->
-                        new RuntimeException("No existe una solicitud con ese email"));
+                .orElseThrow(() -> new RuntimeException("No existe una solicitud con ese email"));
 
         // SOLO ACTUALIZA CAMPOS ENVIADOS
-
-        if (emp.getNombre() != null &&
-                !emp.getNombre().isBlank()) {
-
+        if (emp.getNombre() != null && !emp.getNombre().isBlank())
             existente.setNombre(emp.getNombre());
-        }
+        if (emp.getSector() != null && !emp.getSector().isBlank())
+            existente.setSector(emp.getSector());
+        if (emp.getTelefono() != null && !emp.getTelefono().isBlank())
+            existente.setTelefono(emp.getTelefono());
+        if (emp.getCiudad() != null && !emp.getCiudad().isBlank())
+            existente.setCiudad(emp.getCiudad());
+        if (emp.getDescripcion() != null && !emp.getDescripcion().isBlank())
+            existente.setDescripcion(emp.getDescripcion());
+        if (emp.getPassword() != null && !emp.getPassword().isBlank())
+            existente.setPassword(passwordEncoder.encode(emp.getPassword()));
 
-        if (emp.getPassword() != null &&
-                !emp.getPassword().isBlank()) {
-
-            existente.setPassword(
-                    passwordEncoder.encode(emp.getPassword())
-            );
-        }
-
-        // VOLVER A PENDIENTE
         existente.setEstado("PENDIENTE");
-
-        existente.setMensaje(
-                "Tu solicitud fue actualizada y está nuevamente en revisión"
-        );
-
+        existente.setMensaje("Tu solicitud fue actualizada y está nuevamente en revisión");
         existente.setActivo(true);
 
         return repo.save(existente);
